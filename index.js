@@ -35,11 +35,38 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/coffee/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await coffeeCollection.findOne(query);
+      res.send(result);
+    });
+
     app.post("/coffee", async (req, res) => {
       const newCoffee = req.body;
       const result = await coffeeCollection.insertOne(newCoffee);
       res.send(result);
       console.log(newCoffee);
+    });
+
+    app.put("/coffee/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const updateCoffee = req.body;
+      const coffee = {
+        $set: {
+          name: updateCoffee.name,
+          supplier: updateCoffee.supplier,
+          category: updateCoffee.category,
+          chef: updateCoffee.chef,
+          Price: updateCoffee.Price,
+          details: updateCoffee.details,
+          photo: updateCoffee.photo,
+        },
+      };
+      const result = await coffeeCollection.updateOne(filter, coffee, options);
+      res.send(result);
     });
 
     app.delete("/coffee/:id", async (req, res) => {
